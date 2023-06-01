@@ -1,0 +1,11 @@
+login_ba = ""
+password_ba = ""
+base64_loki = ""
+login_pushgw = ""
+password_pushgw = ""
+url_php_status = "https://test.test/status?json&full"
+url_loki = "https://test.test/loki/api/v1/push"
+url_pushgw = "http://test.test:9091/"
+url_pushgw22 = "http://test.test:9091/metrics/job/metrics/instance/INSTANSSSSS"
+job_name = "test.test"
+
