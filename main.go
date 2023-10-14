@@ -51,6 +51,7 @@ type Process struct {
 type ConfigData struct {
 	LoginBA      string `toml:"login_ba"`
 	PassBA       string `toml:"password_ba"`
+	Base64Status string `toml:"base64_status"`
 	Base64Loki   string `toml:"base64_loki"`
 	LoginPushGW  string `toml:"login_pushgw"`
 	PassPushGW   string `toml:"password_pushgw"`
@@ -86,7 +87,7 @@ func main() {
 	}
 	fmt.Println("=== Start Exporter ===")
 
-	phpData, err := GetPHPStatus(config.UrlPHPStatus)
+	phpData, err := GetPHPStatus(config.UrlPHPStatus, config.Base64Status)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -97,7 +98,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(string(respJson))
+	//fmt.Println(string(respJson))
 
 	err = PushDataToLoki(config, string(respJson))
 	if err != nil {
@@ -115,7 +116,7 @@ func PushDataToLoki(config *ConfigData, data string) error {
 	method := "POST"
 	payload := strings.NewReader(`{
   "streams": [
-		` + data + `
+                ` + data + `
   ]
 }`)
 	client := &http.Client{}
@@ -184,7 +185,7 @@ func OneString(p Process) string {
 	return res
 }
 
-func GetPHPStatus(urlStatus string) (*PHPStatusData, error) {
+func GetPHPStatus(urlStatus string, base64pass string) (*PHPStatusData, error) {
 	var phpData *PHPStatusData
 	method := "GET"
 	client := &http.Client{}
@@ -193,7 +194,7 @@ func GetPHPStatus(urlStatus string) (*PHPStatusData, error) {
 	if err != nil {
 		return nil, err
 	}
-	//req.Header.Add("Authorization", "Basic YWRtaW46MTIzMzQ=")
+	req.Header.Add("Authorization", "Basic "+base64pass)
 
 	res, err := client.Do(req)
 	if err != nil {
